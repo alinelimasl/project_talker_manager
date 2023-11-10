@@ -63,18 +63,18 @@ app.post(
   validateWatchAt,
   validateRate,
   async (req, res) => {
-    const { name, age, talk } = req.body;
-    const talkers = await JSON.parse(fs.readFile(pathTalkers, 'utf-8'));
-    const id = talkers.length + 1;
+    // const { name, age, talk } = req.body;
+    const talkersString = await fs.readFile(pathTalkers, 'utf-8');
+    const talkers = JSON.parse(talkersString);
+    let newId = talkers.length + 1;
     const newTalker = {
-      id,
-      name,
-      age,
-      talk,
+      id: newId,
+      ...req.body,
     };
     talkers.push(newTalker);
+    newId += 1;
     await fs.writeFile(pathTalkers, JSON.stringify(talkers));
-    res.status(201).send(newTalker);
+    return res.status(201).json(newTalker);
   },
 );
 
