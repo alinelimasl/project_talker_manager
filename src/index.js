@@ -2,6 +2,8 @@ const express = require('express');
 const path = require('path');
 const fs = require('fs').promises;
 const generateToken = require('../utils/generateToken');
+const validateEmail = require('../middlewares/validateEmail');
+const validatePassword = require('../middlewares/validatePassword');
 
 const pathTalkers = path.resolve(__dirname, './talker.json');
 
@@ -37,7 +39,7 @@ app.get('/talker/:id', async (req, res) => {
   res.status(200).send(talkerId);
 });
 
-app.post('/login', (req, res) => {
+app.post('/login', validateEmail, validatePassword, (req, res) => {
   const token = generateToken();
   const { email, password } = req.body;
 
