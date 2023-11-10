@@ -63,13 +63,15 @@ app.post(
   validateWatchAt,
   validateRate,
   async (req, res) => {
-    // const { name, age, talk } = req.body;
+    const { name, age, talk } = req.body;
     const talkersString = await fs.readFile(pathTalkers, 'utf-8');
     const talkers = JSON.parse(talkersString);
     let newId = talkers.length + 1;
     const newTalker = {
       id: newId,
-      ...req.body,
+      name,
+      age,
+      talk,
     };
     talkers.push(newTalker);
     newId += 1;
