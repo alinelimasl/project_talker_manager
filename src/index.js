@@ -10,6 +10,7 @@ const validateAge = require('../middlewares/validateAge');
 const validateTalk = require('../middlewares/validateTalk');
 const validateWatchAt = require('../middlewares/validateWatchAt');
 const validateRate = require('../middlewares/validateRate');
+const validateId = require('../middlewares/validateId');
 
 const pathTalkers = path.resolve(__dirname, './talker.json');
 
@@ -79,6 +80,25 @@ app.post(
     return res.status(201).json(newTalker);
   },
 );
+app.put('/talker/:id', 
+  auth,
+  validateName,
+  validateAge,
+  validateTalk,
+  validateWatchAt,
+  validateRate,
+  validateId,
+  async (req, res) => {
+    const { id } = req.params;
+    const { name, age, talk } = req.body;
+    const talkersString = await fs.readFile(pathTalkers, 'utf-8');
+    const talkers = JSON.parse(talkersString);
+    const index = talkers.findIndex((talker) => talker.id === Number(id));
+    talkers[index] = { id: Number(id), name, age, talk };
+    const updateTalkers = JSON.stringify(talkers);
+    await fs.writeFile(pathTalkers, updateTalkers);
+    res.status(200).json(talkers[index]);
+  });
 
 app.listen(PORT, () => {
   console.log('Online');

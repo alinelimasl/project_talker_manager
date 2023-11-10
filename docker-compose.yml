@@ -18,6 +18,8 @@ services:
       # Monta o diretório /src, com o código da aplicação, 
       # dentro do diretório /app
       - ./src:/app/src
+      - ./utils:/app/utils
+      - ./middlewares:/app/middlewares
     # Lista de portas mapeadas de dentro para fora do container
     # na notação porta_de_fora:porta_de_dentro
     ports:
