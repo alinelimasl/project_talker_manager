@@ -4,6 +4,12 @@ const fs = require('fs').promises;
 const generateToken = require('../utils/generateToken');
 const validateEmail = require('../middlewares/validateEmail');
 const validatePassword = require('../middlewares/validatePassword');
+const auth = require('../middlewares/auth');
+const validateName = require('../middlewares/validateName');
+const validateAge = require('../middlewares/validateAge');
+const validateTalk = require('../middlewares/validateTalk');
+const validateWatchAt = require('../middlewares/validateWatchAt');
+const validateRate = require('../middlewares/validateRate');
 
 const pathTalkers = path.resolve(__dirname, './talker.json');
 
@@ -47,6 +53,30 @@ app.post('/login', validateEmail, validatePassword, (req, res) => {
     return res.status(200).json({ token });
   }
 });
+
+app.post(
+  '/talker',
+  auth,
+  validateName,
+  validateAge,
+  validateTalk,
+  validateWatchAt,
+  validateRate,
+  async (req, res) => {
+    const { name, age, talk } = req.body;
+    const talkers = await JSON.parse(fs.readFile(pathTalkers, 'utf-8'));
+    const id = talkers.length + 1;
+    const newTalker = {
+      id,
+      name,
+      age,
+      talk,
+    };
+    talkers.push(newTalker);
+    await fs.writeFile(pathTalkers, JSON.stringify(talkers));
+    res.status(201).send(newTalker);
+  },
+);
 
 app.listen(PORT, () => {
   console.log('Online');
