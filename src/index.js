@@ -1,6 +1,7 @@
 const express = require('express');
 const path = require('path');
 const fs = require('fs').promises;
+const generateToken = require('../utils/generateToken');
 
 const pathTalkers = path.resolve(__dirname, './talker.json');
 
@@ -36,6 +37,17 @@ app.get('/talker/:id', async (req, res) => {
   res.status(200).send(talkerId);
 });
 
+app.post('/login', (req, res) => {
+  const token = generateToken();
+  const { email, password } = req.body;
+
+  if (email && password) {
+    return res.status(200).json({ token });
+  }
+});
+
 app.listen(PORT, () => {
   console.log('Online');
 }); 
+
+module.exports = app;
