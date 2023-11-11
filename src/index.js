@@ -11,6 +11,7 @@ const validateTalk = require('../middlewares/validateTalk');
 const validateWatchAt = require('../middlewares/validateWatchAt');
 const validateRate = require('../middlewares/validateRate');
 const validateId = require('../middlewares/validateId');
+const validateSearch = require('../middlewares/validateSearch');
 
 const pathTalkers = path.resolve(__dirname, './talker.json');
 
@@ -33,23 +34,30 @@ app.get('/talker', async (req, res) => {
     res.status(200).send([]);
   }
 });
+app.get('/talker/search', auth, validateSearch, async (req, res) => {
+  const { q } = req.query;
+  const talkers = JSON.parse(await fs.readFile(pathTalkers, 'utf-8'));
+  const filteredTalkers = talkers.filter((talker) => talker.name.includes(q));
+  
+  return res.status(200).json(filteredTalkers);
+});
 
 app.get('/talker/:id', async (req, res) => {
   const id = Number(req.params.id);
   const talkers = await fs.readFile(pathTalkers, 'utf-8');
   const talkerId = JSON.parse(talkers).find((talker) => talker.id === id);
-
+  
   if (!talkerId) {
     return res.status(404).send({ message: 'Pessoa palestrante não encontrada' });
   }
-
+  
   res.status(200).send(talkerId);
 });
 
 app.post('/login', validateEmail, validatePassword, (req, res) => {
   const token = generateToken();
   const { email, password } = req.body;
-
+  
   if (email && password) {
     return res.status(200).json({ token });
   }
